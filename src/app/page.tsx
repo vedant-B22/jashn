@@ -197,7 +197,7 @@ export default function HomePage() {
         brief={brief}
       />
 
-      <footer className="w-full border-t border-white/10 py-10 px-4 text-center text-xs text-slate-500 no-print">
+      <footer className="w-full border-t border-white/10 py-10 px-4 text-center text-xs text-slate-400 no-print">
         <div className="max-w-7xl mx-auto space-y-3">
           <div className="flex items-center justify-center gap-2">
             <span className="w-6 h-6 rounded-lg bg-gradient-to-tr from-festive-saffron to-festive-rose flex items-center justify-center text-black font-black text-xs">
@@ -205,10 +205,10 @@ export default function HomePage() {
             </span>
             <span className="font-extrabold text-sm text-slate-300">Jashn Luxury Atelier</span>
           </div>
-          <p className="font-medium text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-medium text-slate-300 max-w-2xl mx-auto leading-relaxed">
             GenAI-powered planning assistant organizing weddings, birthdays, and community events with deterministic zero-sum budgets, backward-scheduled timelines, and explainable recommendations.
           </p>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-slate-400">
             Built with pure TypeScript deterministic rules & generative AI • Zero Cloud SDK dependencies • 100% offline fallback compliant • WCAG 2.2 AA Verified
           </p>
         </div>

@@ -177,6 +177,7 @@ export function Navbar({ currentLocale, onLocaleChange, onFinalizePlan, hasPlan 
             <MagneticButton
               variant="primary"
               onClick={onFinalizePlan}
+              aria-label="Celebrate plan"
               className="py-1.5 px-3.5 text-xs font-bold rounded-xl shadow-glow min-h-[38px]"
             >
               <span aria-hidden="true">🎉</span>
