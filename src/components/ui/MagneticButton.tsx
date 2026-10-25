@@ -22,8 +22,12 @@ export function MagneticButton({
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches || document.documentElement.classList.contains('reduce-motion'));
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setReducedMotion(mq.matches || document.documentElement.classList.contains('reduce-motion'));
+    } else if (typeof document !== 'undefined') {
+      setReducedMotion(document.documentElement.classList.contains('reduce-motion'));
+    }
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {

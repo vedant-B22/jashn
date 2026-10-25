@@ -20,8 +20,12 @@ export function Reveal({
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const isReduced = mq.matches || document.documentElement.classList.contains('reduce-motion');
+    const isReduced =
+      (typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+      (typeof document !== 'undefined' && document.documentElement.classList.contains('reduce-motion'));
+
     setReducedMotion(isReduced);
 
     if (isReduced) {

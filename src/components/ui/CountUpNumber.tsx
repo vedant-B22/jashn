@@ -23,8 +23,12 @@ export function CountUpNumber({
   const prevValueRef = useRef(value);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mq.matches || document.documentElement.classList.contains('reduce-motion')) {
+    const isReduced =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (isReduced || (typeof document !== 'undefined' && document.documentElement.classList.contains('reduce-motion'))) {
       setDisplayValue(value);
       prevValueRef.current = value;
       return;

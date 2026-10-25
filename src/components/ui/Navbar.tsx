@@ -27,11 +27,14 @@ export function Navbar({ currentLocale, onLocaleChange, onFinalizePlan, hasPlan 
 
   useEffect(() => {
     // Check initial reduced motion state
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const stored = localStorage.getItem('jashn_reduce_motion') === 'true';
-    const active = stored || mq.matches;
+    const isMqReduced =
+      typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stored = typeof window !== 'undefined' && localStorage.getItem('jashn_reduce_motion') === 'true';
+    const active = Boolean(stored || isMqReduced);
     setIsReducedMotion(active);
-    if (active) {
+    if (active && typeof document !== 'undefined') {
       document.documentElement.classList.add('reduce-motion');
     }
 

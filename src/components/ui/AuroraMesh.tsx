@@ -9,20 +9,28 @@ export function AuroraMesh() {
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches || document.documentElement.classList.contains('reduce-motion'));
+    const isReduced =
+      (typeof window !== 'undefined' &&
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+      (typeof document !== 'undefined' && document.documentElement.classList.contains('reduce-motion'));
+
+    setReducedMotion(isReduced);
 
     // IntersectionObserver to pause animation when offscreen
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setIsPaused(!entry || !entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          setIsPaused(!entry || !entry.isIntersecting);
+        },
+        { threshold: 0.05 }
+      );
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
+      if (containerRef.current) {
+        observer.observe(containerRef.current);
+      }
     }
 
     const handlePointerMove = (e: MouseEvent) => {
@@ -32,7 +40,9 @@ export function AuroraMesh() {
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
 
     return () => {
-      observer.disconnect();
+      if (observer) {
+        observer.disconnect();
+      }
       window.removeEventListener('pointermove', handlePointerMove);
     };
   }, []);

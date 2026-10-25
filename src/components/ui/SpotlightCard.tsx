@@ -23,12 +23,19 @@ export function SpotlightCard({
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches || document.documentElement.classList.contains('reduce-motion'));
+    if (typeof window === 'undefined') return;
 
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    if (typeof window.matchMedia === 'function') {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setReducedMotion(mq.matches || document.documentElement.classList.contains('reduce-motion'));
+
+      const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } else {
+      setReducedMotion(document.documentElement.classList.contains('reduce-motion'));
+      return undefined;
+    }
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
