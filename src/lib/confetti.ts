@@ -20,8 +20,12 @@ const COLORS = ['#FF7F11', '#FFB800', '#D81159', '#E83F6F', '#06D6A0', '#FFF8E7'
 export function triggerFestiveBurst(durationMs = 2500): void {
   if (typeof window === 'undefined') return;
 
-  // Respect reduced-motion preference
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // Respect reduced-motion preference (OS and manual toggle)
+  const isReduced =
+    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+    document.documentElement.classList.contains('reduce-motion');
+
+  if (isReduced) {
     return;
   }
 
