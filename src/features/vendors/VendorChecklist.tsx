@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { VendorChecklistItem, VendorStatus, BudgetCategory } from '@/engine/types';
 import { Locale, DICTIONARIES } from '@/lib/i18n';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 
 interface VendorChecklistProps {
   currentLocale: Locale;
@@ -24,6 +25,7 @@ export function VendorChecklist({ currentLocale, initialChecklists, currency }: 
   const [statuses, setStatuses] = useState<Record<BudgetCategory, VendorStatus>>(() => {
     return {} as Record<BudgetCategory, VendorStatus>;
   });
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -52,34 +54,88 @@ export function VendorChecklist({ currentLocale, initialChecklists, currency }: 
     });
   };
 
+  const toggleExpand = (cat: string) => {
+    setExpandedCategories((prev) => ({ ...prev, [cat]: !prev[cat] }));
+  };
+
+  // Progress metrics
+  const totalCount = initialChecklists.length;
+  const bookedCount = initialChecklists.filter(
+    (item) => (statuses[item.category] ?? item.status) === 'booked'
+  ).length;
+  const bookedPercentage = totalCount > 0 ? Math.round((bookedCount / totalCount) * 100) : 0;
+
   return (
-    <section aria-labelledby="vendors-heading" className="rounded-3xl glass-card p-6 sm:p-8 border border-white/10 shadow-glass space-y-6">
-      <div className="border-b border-white/10 pb-4">
-        <h2 id="vendors-heading" className="text-2xl font-black text-white flex items-center gap-2">
-          <span aria-hidden="true">🤝</span> {t.vendorsTitle}
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">{t.vendorsSubtitle}</p>
+    <SpotlightCard
+      aria-labelledby="vendors-heading"
+      className="p-6 sm:p-10 border border-white/10 shadow-glass space-y-8"
+    >
+      {/* Header with Progress Ring Indicator */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-5">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-festive-gold/10 border border-festive-gold/30 text-xs font-bold text-festive-gold mb-2">
+            <span>●</span> Negotiation Intelligence
+          </div>
+          <h2 id="vendors-heading" className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2.5">
+            <span aria-hidden="true">🤝</span> {t.vendorsTitle}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1">{t.vendorsSubtitle}</p>
+        </div>
+
+        {/* Overall Category Progress Ring Pill */}
+        <div className="flex items-center gap-3 bg-surface-100/90 px-4 py-2.5 rounded-2xl border border-white/10">
+          <div className="relative w-10 h-10 flex items-center justify-center">
+            <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#1E1E34"
+                strokeWidth="3.5"
+              />
+              <path
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#FFB800"
+                strokeWidth="3.5"
+                strokeDasharray={`${bookedPercentage}, 100`}
+                className="transition-all duration-500"
+              />
+            </svg>
+            <span className="absolute text-[10px] font-black text-festive-gold tabular-nums">
+              {bookedPercentage}%
+            </span>
+          </div>
+          <div>
+            <span className="text-xs font-extrabold text-white block">
+              {bookedCount} of {totalCount} Booked
+            </span>
+            <span className="text-[11px] text-slate-400">Contracts Finalized</span>
+          </div>
+        </div>
       </div>
 
+      {/* Vendor Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {initialChecklists.map((item) => {
           const currentStatus = statuses[item.category] ?? item.status;
+          const isExpanded = expandedCategories[item.category] ?? true;
 
           return (
             <div
               key={item.category}
-              className="glass-card p-5 sm:p-6 rounded-2xl border border-white/5 space-y-4 flex flex-col justify-between"
+              className="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4 flex flex-col justify-between transition-all hover:border-festive-gold/30 hover:shadow-glow/5"
             >
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-white/5 pb-3">
+              <div className="space-y-3.5">
+                {/* Header & Status Pill Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b border-white/5 pb-3">
                   <div>
                     <h3 className="font-extrabold text-lg text-white">{item.title}</h3>
-                    <span className="text-xs text-festive-gold">
-                      Recommended Lead Time: {item.leadTimeWeeks} weeks before
+                    <span className="text-xs font-semibold text-festive-gold">
+                      Recommended Lead: {item.leadTimeWeeks} weeks prior
                     </span>
                   </div>
 
-                  {/* Status Picker Pill Group */}
+                  {/* Kanban Status Pill Group */}
                   <div className="flex flex-wrap gap-1" role="group" aria-label={`Status for ${item.title}`}>
                     {STATUS_OPTIONS.map((opt) => (
                       <button
@@ -99,50 +155,68 @@ export function VendorChecklist({ currentLocale, initialChecklists, currency }: 
                   </div>
                 </div>
 
-                {/* Estimated Budget Range */}
-                <div className="text-xs text-slate-300">
-                  <span className="font-semibold text-slate-400">Benchmark Cost: </span>
-                  <strong className="text-white">
+                {/* Benchmark Cost Range */}
+                <div className="text-xs text-slate-300 flex items-center justify-between bg-surface-100/50 p-2.5 rounded-xl border border-white/5">
+                  <span className="font-semibold text-slate-400">Benchmark Market Range:</span>
+                  <strong className="text-white font-mono tabular-nums">
                     {currency} {item.estimatedCostRange.min.toLocaleString()} – {currency} {item.estimatedCostRange.max.toLocaleString()}
                   </strong>
                 </div>
 
-                {/* Key Questions */}
-                <div className="space-y-1.5 pt-1">
-                  <p className="text-xs font-bold text-festive-saffron uppercase tracking-wider">
-                    Must-Ask Questions:
-                  </p>
-                  <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 leading-relaxed">
-                    {item.questionsToAsk.map((q, idx) => (
-                      <li key={idx}>{q}</li>
-                    ))}
-                  </ul>
-                </div>
+                {/* Accordion Toggle */}
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(item.category)}
+                  className="text-xs font-bold text-festive-gold hover:text-white flex items-center gap-1.5 transition-colors pt-1"
+                >
+                  <span>{isExpanded ? '▾ Hide Questions & Warnings' : '▸ Show Questions & Warnings'}</span>
+                </button>
 
-                {/* Red Flags Alert */}
-                <div className="p-3 rounded-xl bg-festive-magenta/10 border border-festive-magenta/20 space-y-1">
-                  <p className="text-[11px] font-bold text-festive-rose uppercase">🚩 Red Flags to Watch:</p>
-                  <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 leading-relaxed">
-                    {item.redFlags.map((flag, idx) => (
-                      <li key={idx}>{flag}</li>
-                    ))}
-                  </ul>
-                </div>
+                {/* Collapsible Content */}
+                {isExpanded && (
+                  <div className="space-y-3 pt-2">
+                    {/* Must-Ask Questions */}
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-extrabold text-festive-saffron uppercase tracking-wider">
+                        Essential Vendor Questions:
+                      </p>
+                      <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 leading-relaxed">
+                        {item.questionsToAsk.map((q, idx) => (
+                          <li key={idx}>{q}</li>
+                        ))}
+                      </ul>
+                    </div>
 
-                {/* Negotiation Tips */}
-                <div className="p-3 rounded-xl bg-festive-gold/10 border border-festive-gold/20 space-y-1">
-                  <p className="text-[11px] font-bold text-festive-gold uppercase">💡 Negotiation Power Move:</p>
-                  <ul className="text-xs text-slate-300 space-y-1 list-disc pl-4 leading-relaxed">
-                    {item.negotiationTips.map((tip, idx) => (
-                      <li key={idx}>{tip}</li>
-                    ))}
-                  </ul>
-                </div>
+                    {/* Red Flag Contract Warnings */}
+                    <div className="p-3 rounded-xl bg-festive-rose/10 border border-festive-rose/25 space-y-1">
+                      <p className="text-[11px] font-black text-festive-rose uppercase tracking-wider flex items-center gap-1.5">
+                        <span>⚠️</span> Contract Red Flags to Check:
+                      </p>
+                      <ul className="text-xs text-slate-300 space-y-0.5 list-disc pl-4 leading-relaxed">
+                        {item.redFlags.map((flag, idx) => (
+                          <li key={idx} className="text-slate-300">{flag}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Negotiation Tactics */}
+                    <div className="p-3 rounded-xl bg-festive-indigo/30 border border-festive-indigo/60 space-y-1">
+                      <p className="text-[11px] font-black text-festive-gold uppercase tracking-wider flex items-center gap-1.5">
+                        <span>💡</span> Negotiation Tactics & Tips:
+                      </p>
+                      <ul className="text-xs text-slate-300 space-y-0.5 list-disc pl-4 leading-relaxed">
+                        {item.negotiationTips.map((tip, idx) => (
+                          <li key={idx} className="text-slate-300">{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           );
         })}
       </div>
-    </section>
+    </SpotlightCard>
   );
 }
