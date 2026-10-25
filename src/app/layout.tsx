@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { GrainOverlay } from '@/components/ui/GrainOverlay';
+import { ScrollProgress } from '@/components/ui/ScrollProgress';
+import { AuroraMesh } from '@/components/ui/AuroraMesh';
 
 export const metadata: Metadata = {
   title: 'Jashn — GenAI Celebration & Event Planner',
@@ -22,15 +25,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-background text-slate-100 min-h-screen bg-grain antialiased selection:bg-festive-saffron selection:text-white">
+    <html lang="en" className="dark scroll-smooth">
+      <body className="bg-background text-slate-100 min-h-screen antialiased selection:bg-festive-saffron selection:text-black relative">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-festive-saffron text-black font-semibold rounded-md shadow-lg outline-none ring-2 ring-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2.5 bg-festive-gold text-black font-extrabold rounded-xl shadow-glow outline-none ring-2 ring-white"
         >
           Skip to main content
         </a>
-        <div className="relative min-h-screen flex flex-col">{children}</div>
+
+        {/* Global ambient background & tactile film grain */}
+        <AuroraMesh />
+        <GrainOverlay />
+        <ScrollProgress />
+
+        <div className="relative min-h-screen flex flex-col z-10">{children}</div>
       </body>
     </html>
   );
