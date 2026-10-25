@@ -3,12 +3,20 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0f19;
+  --background: #07070d;
   --foreground: #f8fafc;
-  --festive-saffron: #ff7f11;
-  --festive-gold: #ffb800;
+  --festive-saffron: #ff9f1c;
+  --festive-gold: #ffc857;
   --festive-magenta: #d81159;
-  --festive-indigo: #1e1b4b;
+  --festive-rose: #e83f6f;
+  --festive-indigo: #4c3bcf;
+  --festive-jade: #06d6a0;
+
+  /* Elevation surfaces */
+  --surface-0: #07070d;
+  --surface-1: #0d0d18;
+  --surface-2: #141424;
+  --surface-3: #1e1e34;
 }
 
 body {
@@ -19,42 +27,76 @@ body {
   min-height: 100vh;
 }
 
-/* Subtle SVG noise / grain overlay */
-.bg-grain {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
-  background-size: 24px 24px;
+/* Tabular numerals for monetary, metric, and percentage counters */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-/* Glassmorphism card utility */
+/* Custom accessible focus rings */
+:focus-visible {
+  outline: 2px solid var(--festive-gold);
+  outline-offset: 3px;
+  box-shadow: 0 0 16px rgba(255, 200, 87, 0.45);
+}
+
+/* Glassmorphism card utility with hairline borders */
 .glass-card {
-  background: rgba(20, 26, 41, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(13, 13, 24, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card-hover {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease;
 }
 
 .glass-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 184, 0, 0.25);
-  box-shadow: 0 12px 30px -10px rgba(255, 127, 17, 0.2);
+  transform: translateY(-3px);
+  border-color: rgba(255, 200, 87, 0.3);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(255, 159, 28, 0.2);
 }
 
-/* Animated mesh gradient for hero */
-@keyframes meshRotate {
-  0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.1) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
+/* Rotating conic gradient border for the Command Bar */
+@keyframes rotateConic {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.animate-mesh {
-  animation: meshRotate 25s infinite linear;
+.conic-border-glow {
+  position: relative;
 }
 
-/* Shimmer skeleton */
+.conic-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg, #ff9f1c, #e83f6f, #4c3bcf, #ffc857, #ff9f1c);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: rotateConic 8s linear infinite;
+}
+
+/* Shimmer gradient sweep for buttons & text accents */
+@keyframes textShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, #ff9f1c, #ffc857, #e83f6f, #ffc857, #ff9f1c);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 6s linear infinite;
+}
+
+/* Skeleton shimmer */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -68,43 +110,78 @@ body {
 
 /* Critical path pulse */
 @keyframes criticalPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(216, 17, 89, 0.6); }
-  50% { box-shadow: 0 0 0 8px rgba(216, 17, 89, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 63, 111, 0.6); }
+  50% { box-shadow: 0 0 0 10px rgba(232, 63, 111, 0); }
 }
 
 .pulse-critical {
   animation: criticalPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Print stylesheet */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #111827 !important;
-  }
-  .no-print {
-    display: none !important;
-  }
-  .glass-card {
-    background: transparent !important;
-    border: 1px solid #e5e7eb !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-    color: #111827 !important;
-  }
-  .print-page-break {
-    page-break-after: always;
-  }
+/* Ambient mesh background drifter */
+@keyframes meshDrift {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate3d(30px, -20px, 0) scale(1.08) rotate(120deg); }
+  66% { transform: translate3d(-20px, 25px, 0) scale(0.95) rotate(240deg); }
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(360deg); }
 }
 
-/* Respect user's motion preference */
+.animate-aurora {
+  animation: meshDrift 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ==========================================================
+   Reduced Motion Rules (WCAG 2.2 AA & System/User Preference)
+   ========================================================== */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
+  *, ::before, ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .conic-border-glow::before {
+    animation: none !important;
+    background: rgba(255, 200, 87, 0.4) !important;
+  }
+  .animate-aurora, .shimmer-text, .pulse-critical, .skeleton-shimmer {
+    animation: none !important;
+  }
+}
+
+.reduce-motion *, .reduce-motion ::before, .reduce-motion ::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.reduce-motion .conic-border-glow::before {
+  animation: none !important;
+  background: rgba(255, 200, 87, 0.4) !important;
+}
+
+.reduce-motion .animate-aurora,
+.reduce-motion .shimmer-text,
+.reduce-motion .pulse-critical,
+.reduce-motion .skeleton-shimmer {
+  animation: none !important;
+}
+
+/* Print stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print, header, footer, #jashn-nav-dock {
+    display: none !important;
+  }
+  .glass-card {
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
   }
 }
